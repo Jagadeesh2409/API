@@ -12,6 +12,7 @@ app.use(express.json());
 app.use('/api',routes)
 app.use('/api',router1)
 
+
 app.listen(3000,()=>{
     console.log("http://localhost:3000")
 })
