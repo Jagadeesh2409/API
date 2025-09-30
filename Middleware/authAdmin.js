@@ -1,7 +1,6 @@
 const json=require('jsonwebtoken')
 require('dotenv').config()
 
-
 const admin =(req,res,next)=>{
     const header = req.headers['authorization']; 
     const token = header.split(' ')[1]
