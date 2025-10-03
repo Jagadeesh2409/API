@@ -83,7 +83,6 @@ const updateProduct = async (req, res) => {
         name,
         description,
         price,
-        categories: JSON.stringify(categories), // if stored as JSON
         updated_at: knex.fn.now()
       });
 
