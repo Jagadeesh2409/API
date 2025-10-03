@@ -5,10 +5,13 @@ const { addProduct,deleteProduct,viewProducts,updateProduct } = require('../cont
 const upload = require('../Middleware/multer')
 
 
+
 route.post('/addproduct', admin, upload.single('image'), addProduct)
 route.post('/deleteproduct', admin, deleteProduct)
 route.get('/product', admin, viewProducts )
 route.put('/products/:id',admin, updateProduct);
 
 
+
 module.exports = route
+

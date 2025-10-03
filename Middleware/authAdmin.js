@@ -10,7 +10,6 @@ const admin =(req,res,next)=>{
             return res.status(400).json({message:"token expired"})     
         }
         req.user=decode 
-        console.log(decode)
         if(decode.role=='admin'){
              next()
         }        

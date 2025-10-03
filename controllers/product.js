@@ -70,7 +70,7 @@ const deleteProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, categories, images } = req.body;
+    const { name, description, price } = req.body;
 
     const product = await knex('products').where({ id }).first();
     if (!product) {
