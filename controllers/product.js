@@ -3,7 +3,19 @@ const knex = require('../db/knex')
 
 const viewProducts = async(req,res) =>{
     try {
-        const products = await knex('products').select('*');
+   const products = await knex('products as p')
+  .leftJoin('products_img as i', 'p.id', 'i.product_id')
+  .select(
+    'p.id',
+    'p.name',
+    'p.description',
+    'p.price',
+    'p.categories',
+    knex.raw('COALESCE(GROUP_CONCAT(i.url), "") as images')
+  )
+  .groupBy('p.id');
+
+
         if(!products) return res.status(400).json({message:"no products in the database"})
         return res.status(200).json({products})
     } catch (error) {
@@ -40,7 +52,6 @@ const addProduct = async (req, res) => {
 
 }
 
-
 const deleteProduct = async (req, res) => {
     try {
         const id = req.body.id
@@ -56,5 +67,33 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, categories, images } = req.body;
 
-module.exports = { addProduct ,deleteProduct,viewProducts}
+    const product = await knex('products').where({ id }).first();
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    await knex('products')
+      .where({ id })
+      .update({
+        name,
+        description,
+        price,
+        categories: JSON.stringify(categories), // if stored as JSON
+        updated_at: knex.fn.now()
+      });
+
+    return res.status(200).json({ message: "Product updated successfully" });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+module.exports = { addProduct ,deleteProduct,viewProducts, updateProduct}
