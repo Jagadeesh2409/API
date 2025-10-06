@@ -73,6 +73,9 @@ const cartItems = await knex('cart')
     'cart.quantity',
     knex.raw("COALESCE(GROUP_CONCAT(products_img.url SEPARATOR ','), '') as images")
   );
+  if(!cartItems){
+     res.status(300).json({ cart: "cart is empty"});
+  }
 
     res.status(200).json({ cart: cartItems });
   } catch (error) {
