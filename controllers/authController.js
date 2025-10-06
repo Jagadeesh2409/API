@@ -41,9 +41,13 @@ const login = async(req,res)=>{
 }
 
 const profile = async (req,res) => {
-    const id=req.user.id
-    const data =await knex('accounts').where({id})
+    try {
+        const id=req.user.id
+        const data =await knex('accounts').where({id})
     return res.status(200).json({message:data})  
+    } catch (error) {
+        return res.status(200).json({message:error.message}) 
+    }
 }
 
 
