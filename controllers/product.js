@@ -24,7 +24,18 @@ const viewProducts = async (req, res) => {
 
 const addProduct = async (req, res) => {
   try {
-    const { name, description, price, categories } = req.body;
+    const {
+      name,
+      description,
+      original_price,
+      current_price,
+      categories,
+      stock,
+      discount,
+      tax,
+      brand,
+      specifications,
+    } = req.body;
     const url = `${req.protocol}://${req.host}/${req.file.path}`;
     console.log(url);
 
@@ -34,9 +45,15 @@ const addProduct = async (req, res) => {
     }
     const data = {
       name,
-      price,
+      original_price,
+      current_price,
+      discount,
+      tax,
       description,
-      categories: categ.id,
+      brand,
+      specifications,
+      categories,
+      stock,
     };
 
     const product = await knex("products").insert(data);
@@ -65,27 +82,36 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, price } = req.body;
-
-    const product = await knex("products").where({ id }).first();
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    await knex("products").where({ id }).update({
-      name,
-      description,
-      price,
-      updated_at: knex.fn.now(),
-    });
-
-    return res.status(200).json({ message: "Product updated successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error", error });
+  const id = req.body.id;
+  const {
+    name,
+    description,
+    original_price,
+    current_price,
+    categories,
+    stock,
+    discount,
+    tax,
+    brand,
+    specifications,
+  } = req.body;
+  const data = {
+    name,
+    description,
+    original_price,
+    current_price,
+    categories,
+    stock,
+    discount,
+    tax,
+    brand,
+    specifications,
+  };
+  const upd = await knex("products").where({ id }).update(data);
+  if (!upd) {
+    return res.status(200).json({ message: "no product key available" });
   }
+  return res.status(200).json({ message: "product is updated" });
 };
 
 const pricechange = async (req, res) => {
