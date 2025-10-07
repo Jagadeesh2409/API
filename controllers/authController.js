@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const knex = require("../db/knex");
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phno } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ message: "require all the fields" });
   }
@@ -15,7 +15,12 @@ const register = async (req, res) => {
   const salt = parseInt(process.env.SALT_ROUND);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  await knex("accounts").insert({ name, email, password: hashedPassword });
+  await knex("accounts").insert({
+    name,
+    email,
+    password: hashedPassword,
+    phno,
+  });
 
   return res.status(200).json({ message: "user successfully registered" });
 };
@@ -74,15 +79,4 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const profile = async (req, res) => {
-  try {
-    const id = req.user.id;
-    const data = await knex("accounts").where({ id });
-
-    return res.status(200).json({ message: data });
-  } catch (error) {
-    return res.status(200).json({ message: error.message });
-  }
-};
-
-module.exports = { register, login, profile, resetPassword };
+module.exports = { register, login, resetPassword };

@@ -3,7 +3,7 @@ exports.up = function (knex) {
     table.increments("id").primary();
     table.string("name").notNullable().unique();
     table.double("original_price", 12, 2).notNullable();
-    table.string("current_price", 12, 2).notNullable();
+    table.decimal("current_price", 12, 2).notNullable();
     table.double("discount", 5, 2).defaultTo(0.0);
     table.double("tax", 5, 2).defaultTo(0.0);
     table.text("description").notNullable();

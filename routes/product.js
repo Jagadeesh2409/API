@@ -11,6 +11,7 @@ const {
   updatediscount,
   updatetax,
 } = require("../controllers/product");
+
 const upload = require("../Middleware/multer");
 
 route.post("/addproduct", admin, upload.single("image"), addProduct);

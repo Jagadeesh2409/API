@@ -24,6 +24,16 @@ const viewProducts = async (req, res) => {
 
 const addProduct = async (req, res) => {
   try {
+    // Validate required fields
+    const requiredFields = ["name", "original_price", "categories"];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res
+          .status(400)
+          .json({ message: `Missing required field: ${field}` });
+      }
+    }
+
     const {
       name,
       description,
@@ -31,29 +41,65 @@ const addProduct = async (req, res) => {
       current_price,
       categories,
       stock,
-      discount,
-      tax,
+      discount = 0,
+      tax = 0,
       brand,
       specifications,
     } = req.body;
-    const url = `${req.protocol}://${req.host}/${req.file.path}`;
-    console.log(url);
 
+    // Validate file upload
+    if (!req.file) {
+      return res.status(400).json({ message: "Product image is required" });
+    }
+
+    // Safely parse specifications if provided
+    let specjson = null;
+    if (specifications) {
+      try {
+        const spec = JSON.parse(specifications);
+        specjson = JSON.stringify(spec);
+      } catch (err) {
+        return res
+          .status(400)
+          .json({ message: "Invalid specifications JSON format" });
+      }
+    }
+
+    // Construct proper file URL
+    const url = `${req.protocol}://${req.get("host")}/product_images/${
+      req.file.filename
+    }`;
+
+    // Ensure category exists
     const categ = await knex("categories").where({ name: categories }).first();
     if (!categ) {
-      await knex("categories").insert({ name: categories });
+      await knex("categories").insert({ name: categories, description: "" });
     }
+
+    // Calculate current price if not provided
+    const calculatedCurrentPrice = current_price || original_price;
+
+    // Get category ID instead of name
+    const categoryRecord = await knex("categories")
+      .where({ name: categories })
+      .first();
+    if (!categoryRecord) {
+      return res.status(400).json({ message: "Invalid category" });
+    }
+
     const data = {
       name,
-      original_price,
-      current_price,
-      discount,
-      tax,
-      description,
-      brand,
-      specifications,
-      categories,
-      stock,
+      original_price: parseFloat(original_price),
+      current_price: String(calculatedCurrentPrice), // Schema expects string
+      discount: parseFloat(discount || 0),
+      tax: parseFloat(tax || 0),
+      description: description || "",
+      brand: brand || "",
+      specifications: specjson || "{}",
+      categories: categoryRecord.id, // Use category ID, not name
+      stock: parseInt(stock || 0),
+      created_at: knex.fn.now(),
+      updated_at: knex.fn.now(),
     };
 
     const product = await knex("products").insert(data);
