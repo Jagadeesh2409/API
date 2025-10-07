@@ -49,6 +49,31 @@ const login = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  const { email, oldPassword, newPassword } = req.body;
+  if (!email || !oldPassword || !newPassword) {
+    return res.status(400).json({ message: "require all the fields" });
+  }
+  try {
+    const user = await knex("accounts").where({ email }).first();
+    if (!user) {
+      return res.status(400).json({ message: "invalid email" });
+    }
+    const verify = await bcrypt.compare(oldPassword, user.password);
+    if (!verify) {
+      return res.status(400).json({ message: "old password is incorrect" });
+    }
+    const salt = parseInt(process.env.SALT_ROUND);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    await knex("accounts")
+      .where({ email })
+      .update({ password: hashedPassword });
+    return res.status(200).json({ message: "password successfully updated" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const profile = async (req, res) => {
   try {
     const id = req.user.id;
@@ -60,4 +85,4 @@ const profile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, profile };
+module.exports = { register, login, profile, resetPassword };
