@@ -1,0 +1,10 @@
+Daily Task – 24/09/2025
+
+✅ Implemented set profile API to upload and store user profile details (with image).
+✅ Created get profile API to fetch user information such as name, email, phone number along with profile image.
+✅ Combined data from two database tables (users and user_profile) using join query to return complete profile details in a single response.
+✅ Verified data retrieval and ensured static serving of profile images from the uploads folder.
+✅ Handled form-data parsing in Postman for both text fields and file upload.
+✅ Configured multer storage with separate folders for profile, videos, and files.
+✅ Debugged and fixed issues related to circular JSON response and incorrect table joins.
+✅ Successfully validated the complete flow from upload → database save → fetch and serve profile details.
